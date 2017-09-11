@@ -3,6 +3,7 @@ A library providing arithmetic operations over GF(2^8)
 
 Toy example:
 ```
+$ ghci Data.GF256
 > let x = 1111 :: GF256 PP301
 > let y = 1112 :: GF256 PP301
 > x
