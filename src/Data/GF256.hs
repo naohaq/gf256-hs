@@ -10,7 +10,7 @@ module Data.GF256
 
 import Prelude hiding (toInteger)
 import qualified Data.GF2 as F2
-import Data.ExtendedF2
+import Data.ExtensionF2
 import Data.List (sort)
 import qualified Data.Array.Unboxed as UA
 import Data.Ratio
@@ -45,7 +45,7 @@ primTable x = PA $ UA.array (0,254) $ zip [0..254] $ genPrimList x
 logTable :: (GenPoly256 a) => a -> LogArray
 logTable x = LA $ UA.array (1,255) $ genLogList x
 
-instance (GenPoly256 a) => ExtendedF2 (GF256 a) where
+instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
   generator _ = genInt (undefined :: a)
   fromInt x = ret
     where ret = GF256 $ x `F2.mod` generator ret
@@ -55,6 +55,7 @@ instance (GenPoly256 a) => ExtendedF2 (GF256 a) where
     where LA tbl = logTable (undefined :: a)
   pow2 x = fromInt $ tbl UA.! (x `mod` 255)
     where PA tbl = primTable (undefined :: a)
+  degree _ = 8
 
 instance Show (GF256 a) where
   showsPrec n (GF256 x) = showsPrec n x
