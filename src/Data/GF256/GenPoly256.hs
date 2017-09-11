@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 
-module Data.GenPoly256
+module Data.GF256.GenPoly256
   (GenPoly256 (..),
    PP285, PP299, PP301, PP333, PP351, PP355, PP357, PP361,
    PP369, PP391, PP397, PP425, PP451, PP463, PP487, PP501

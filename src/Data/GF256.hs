@@ -5,7 +5,7 @@
 module Data.GF256
   ( GF256
   , toInteger
-  , module Data.GenPoly256
+  , module Data.GF256.GenPoly256
   ) where
 
 import Prelude hiding (toInteger)
@@ -16,7 +16,8 @@ import qualified Data.Array.Unboxed as UA
 import Data.Ratio
 import Data.Bits
 import Data.Typeable
-import Data.GenPoly256
+
+import Data.GF256.GenPoly256
 
 newtype GF256 a = GF256 Int deriving (Eq, Typeable)
 
