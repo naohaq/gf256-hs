@@ -1,6 +1,17 @@
 {-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable #-}
 {-# LANGUAGE CPP, KindSignatures, DataKinds, ConstraintKinds #-}
 {-# OPTIONS_GHC -Wall #-}
+-----------------------------------------------------------------------------
+-- |
+-- module      :  Data.GF256
+-- Copyright   :  (c) 2017 Naoyuki MORITA
+-- License     :  MIT
+--
+-- Maintainer  :  naoyuki.morita@gmail.com
+-- Stability   :  experimental
+-- Portability :  non-portable (ScopedTypeVariables, DeriveDataTypeable)
+--
+-----------------------------------------------------------------------------
 
 module Data.GF256
   ( GF256
@@ -68,3 +79,5 @@ instance (GenPoly256 a) => FiniteField (GF256 a) where
   pthRoot x = x * x
   allValues = 0 : map pow2 [0..254]
 -}
+
+-- EOF
