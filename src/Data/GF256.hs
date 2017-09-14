@@ -10,8 +10,8 @@ module Data.GF256
 
 import Prelude hiding (toInteger)
 import qualified Data.GF2 as F2
+-- import Data.FiniteField.Base
 import Data.ExtensionF2
-import Data.List (sort)
 import qualified Data.Array.Unboxed as UA
 import Data.Ratio
 import Data.Bits
@@ -24,9 +24,6 @@ newtype GF256 a = GF256 Int deriving (Eq, Typeable)
 toInteger :: GF256 a -> Integer
 toInteger (GF256 x) = fromIntegral x
 
-newtype PrimitiveArray = PA (UA.UArray Int Int)
-newtype LogArray = LA (UA.UArray Int Int)
-
 genPrimList :: (GenPoly256 a) => a -> [Int]
 genPrimList x = 1 : (takeWhile (/= 1) $ iterate nextElem 2)
   where gp = genInt x
@@ -36,15 +33,6 @@ genPrimList x = 1 : (takeWhile (/= 1) $ iterate nextElem 2)
                        then z `xor` gp
                        else z
 
-genLogList :: (GenPoly256 a) => a -> [(Int,Int)]
-genLogList x = sort $ zip (genPrimList x) [0..]
-
-primTable :: (GenPoly256 a) => a -> PrimitiveArray
-primTable x = PA $ UA.array (0,254) $ zip [0..254] $ genPrimList x
-
-logTable :: (GenPoly256 a) => a -> LogArray
-logTable x = LA $ UA.array (1,255) $ genLogList x
-
 instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
   generator _ = genInt (undefined :: a)
   fromInt x = ret
@@ -52,9 +40,9 @@ instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
   toInt (GF256 x) = x
   primitives _ = genPrimList (undefined :: a)
   log2 x = tbl UA.! (toInt x)
-    where LA tbl = logTable (undefined :: a)
+    where tbl = logTable (undefined :: a)
   pow2 x = fromInt $ tbl UA.! (x `mod` 255)
-    where PA tbl = primTable (undefined :: a)
+    where tbl = powTable (undefined :: a)
   degree _ = 8
 
 instance Show (GF256 a) where
@@ -73,3 +61,10 @@ instance (GenPoly256 a) => Fractional (GF256 a) where
   fromRational r = fromInteger (numerator r) / fromInteger (denominator r)
   recip x = pow2 $ 255 - log2 x
 
+{-
+instance (GenPoly256 a) => FiniteField (GF256 a) where
+  order _ = 256
+  char  _ = 2
+  pthRoot x = x * x
+  allValues = 0 : map pow2 [0..254]
+-}
