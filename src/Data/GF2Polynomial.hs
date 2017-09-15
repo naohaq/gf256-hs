@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
--- module      :  Data.GF2
+-- module      :  Data.GF2Polynomial
 -- Copyright   :  (c) 2017 Naoyuki MORITA
 -- License     :  MIT
 --
@@ -29,7 +29,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Data.GF2
+module Data.GF2Polynomial
   ( mul
   , divMod
   , mod

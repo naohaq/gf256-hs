@@ -20,7 +20,7 @@ module Data.GF256
   ) where
 
 import Prelude hiding (toInteger)
-import qualified Data.GF2 as F2
+import qualified Data.GF2Polynomial as F2
 -- import Data.FiniteField.Base
 import Data.ExtensionF2
 import qualified Data.Array.Unboxed as UA
