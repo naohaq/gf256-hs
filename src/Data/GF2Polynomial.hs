@@ -31,6 +31,7 @@
 
 module Data.GF2Polynomial
   ( mul
+  , add
   , divMod
   , mod
   , order
@@ -45,14 +46,22 @@ highBit 1 = 0
 highBit n = 1 + highBit (n `shiftR` 1)
 
 -- |Multiplies two numbers as polynomials over GF(2).
+infixl 7 `mul`
 mul :: (Bits a, Num a) => a -> a -> a
 mul x y = iter 0 x y
   where iter prod _ 0 = prod
         iter prod a b
-          | (b .&. 1) /= 0  = iter (prod `xor` a) a' b'
+          | (b .&. 1) /= 0  = iter (prod `add` a) a' b'
           | otherwise       = iter  prod          a' b'
           where a' = a `shiftL` 1
                 b' = b `shiftR` 1
+
+-- |Adds two numbers as polynomials over GF(2).
+--
+-- @(a \`add\` b)@ is equivalent to @(a \`xor\` b)@.
+infixl 6 `add`
+add :: (Bits a, Num a) => a -> a -> a
+add x y = x `xor` y
 
 -- |Calculates the quotient and the remainder of A/B.
 --
@@ -74,11 +83,15 @@ divMod x y | x < 0     = divMod (-x) y
                 r' = r `xor` (y `shiftL` s)
 
 -- |The function returns only remainder part of division.
+infixl 7 `mod`
 mod :: (Integral a, Bits a) => a -> a -> a
 mod x y = snd $ divMod x y
 
--- |Returns <http://mathworld.wolfram.com/PolynomialOrder.html polynomial order>
--- of argument. 0 will be returned for an even number.
+-- |Calculate <http://mathworld.wolfram.com/MultiplicativeOrder.html multiplicative order>
+-- of \(x\) (mod \(P(x)\)). 0 will be returned for an even number.
+--
+-- For given polynomial \(P(x)\) \((P(0)\neq{0})\), multiplicative
+-- order \(e\) is the smallest number that satisfies \(x^e \equiv 1\ (\mathrm{mod}\ P(x))\).
 --
 -- Following condition is satisfied:
 --
@@ -86,6 +99,6 @@ mod x y = snd $ divMod x y
 order :: Integer -> Integer
 order x | x .&. 1 == 0  = 0
         | otherwise     = iter 1 2
-  where iter n p | r == 0    = n
-                 | otherwise = iter (n+1) (p*2)
-          where r = (p+1) `mod` x
+  where iter n p | r == 1    = n
+                 | otherwise = iter (n+1) (r*2)
+          where r = p `mod` x
