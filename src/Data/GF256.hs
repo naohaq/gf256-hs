@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable #-}
+{-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable, TemplateHaskell #-}
 {-# LANGUAGE CPP, KindSignatures, DataKinds, ConstraintKinds #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
@@ -9,14 +9,14 @@
 --
 -- Maintainer  :  naoyuki.morita@gmail.com
 -- Stability   :  experimental
--- Portability :  non-portable (ScopedTypeVariables, DeriveDataTypeable)
+-- Portability :  non-portable (ScopedTypeVariables, DeriveDataTypeable, TemplateHaskell)
 --
 -----------------------------------------------------------------------------
 
 module Data.GF256
   ( GF256
   , toInteger
-  , module Data.GF256.GenPoly256
+  , module Data.GF256.GP256Insts
   ) where
 
 import Prelude hiding (toInteger)
@@ -29,6 +29,7 @@ import Data.Bits
 import Data.Typeable
 
 import Data.GF256.GenPoly256
+import Data.GF256.GP256Insts
 
 newtype GF256 a = GF256 Int deriving (Eq, Typeable)
 
