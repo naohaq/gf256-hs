@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
@@ -7,7 +8,7 @@
 --
 -- Maintainer  :  naoyuki.morita@gmail.com
 -- Stability   :  experimental
--- Portability :  portable
+-- Portability :  non-portable (BangPatterns)
 --
 -- Arithmetic operations treating integral values as polynomials over GF(2).
 --
@@ -16,7 +17,7 @@
 -- > x^10 + x^7 + x^6 + x^4 + x
 --
 -- In this view, product of two integers is calculated as polynomial
--- multiplication. e.g. @7@ (= @x^2+x+1@) @\`mul\`@ @6@ (= @x^2+x@) would be:
+-- multiplication. e.g. @7@ @\`mul\`@ @6@ would be:
 --
 -- > (x^2 + x + 1) * (x^2 + x) 
 -- >   = x^4 + x^3 + x^3 + x^2 + x^2 + x
@@ -49,8 +50,8 @@ highBit n = 1 + highBit (n `shiftR` 1)
 infixl 7 `mul`
 mul :: (Bits a, Num a) => a -> a -> a
 mul x y = iter 0 x y
-  where iter prod _ 0 = prod
-        iter prod a b
+  where iter !prod  _  0 = prod
+        iter !prod !a !b
           | (b .&. 1) /= 0  = iter (prod `add` a) a' b'
           | otherwise       = iter  prod          a' b'
           where a' = a `shiftL` 1
@@ -75,9 +76,9 @@ divMod x y | x < 0     = divMod (-x) y
            | otherwise = iter n (n-m) 0 x
   where n = highBit x
         m = highBit y
-        iter t s q r | s < 0     = (q,r)
-                     | b /= 0    = iter (t-1) (s-1) q' r'
-                     | otherwise = iter (t-1) (s-1) q r
+        iter !t !s !q !r | s < 0     = (q,r)
+                         | b /= 0    = iter (t-1) (s-1) q' r'
+                         | otherwise = iter (t-1) (s-1) q r
           where b  = r .&.   (1 `shiftL` t)
                 q' = q .|.   (1 `shiftL` s)
                 r' = r `xor` (y `shiftL` s)
@@ -99,6 +100,6 @@ mod x y = snd $ divMod x y
 order :: Integer -> Integer
 order x | x .&. 1 == 0  = 0
         | otherwise     = iter 1 2
-  where iter n p | r == 1    = n
-                 | otherwise = iter (n+1) (r*2)
+  where iter !n !p | r == 1    = n
+                   | otherwise = iter (n+1) (r*2)
           where r = p `mod` x
