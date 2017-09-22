@@ -1,5 +1,4 @@
 {-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable, TemplateHaskell #-}
-{-# LANGUAGE CPP, KindSignatures, DataKinds, ConstraintKinds #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
@@ -62,6 +61,8 @@ instance Show (GF256 a) where
 
 instance (GenPoly256 a) => Num (GF256 a) where
   x + y = fromInt $ toInt x `xor` toInt y
+  0 * _ = 0
+  _ * 0 = 0
   x * y = pow2 $ (log2 x + log2 y)
   x - y = x + y
   negate x = x
