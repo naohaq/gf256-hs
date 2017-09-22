@@ -46,10 +46,11 @@ declInstGP256' nameT nameV =
    |]
 
 declNT :: TH.Name -> TH.Name -> Integer -> TH.DecQ
-declNT tcon vcon n = TH.newtypeD cxt tcon [] Nothing (body vcon) (sequence [])
+declNT tcon vcon n = TH.newtypeD cxt tcon [] Nothing (body vcon) drv
   where cxt = TH.cxt []
         tp  = TH.bangType noBang (natT n)
         body nm = TH.normalC nm [tp]
+        drv = sequence []
 
 declInstGP256 :: Integer -> TH.DecsQ
 declInstGP256 n = do
