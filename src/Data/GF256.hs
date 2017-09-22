@@ -45,15 +45,15 @@ genPrimList x = 1 : (takeWhile (/= 1) $ iterate nextElem 2)
                        else z
 
 instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
-  generator _ = genInt (undefined :: a)
+  generator _ = genInt (genVal :: a)
   fromInt x = ret
     where ret = GF256 $ x `F2.mod` generator ret
   toInt (GF256 x) = x
-  primitives _ = genPrimList (undefined :: a)
+  primitives _ = genPrimList (genVal :: a)
   log2 x = tbl UA.! (toInt x)
-    where tbl = logTable (undefined :: a)
+    where tbl = logTable (genVal :: a)
   pow2 x = fromInt $ tbl UA.! (x `mod` 255)
-    where tbl = powTable (undefined :: a)
+    where tbl = powTable (genVal :: a)
   degree _ = 8
 
 instance Show (GF256 a) where
@@ -68,7 +68,7 @@ instance (GenPoly256 a) => Num (GF256 a) where
   negate x = x
   abs x = x
   signum _ = 1
-  fromInteger x = fromInt $ fromIntegral $ x `F2.mod` fromIntegral (genInt (undefined :: a))
+  fromInteger x = fromInt $ fromIntegral $ x `F2.mod` fromIntegral (genInt (genVal :: a))
 
 instance (GenPoly256 a) => Fractional (GF256 a) where
   fromRational r = fromInteger (numerator r) / fromInteger (denominator r)

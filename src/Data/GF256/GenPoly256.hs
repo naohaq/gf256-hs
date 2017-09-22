@@ -34,7 +34,7 @@ declInstGP256 nameT nameV =
   [d|
     instance GenPoly256 $(TH.conT nameT) where
       genVal = $(TH.conE nameV) undefined
-      genInt ($(TH.conP nameV [ [p|x|] ])) = toInt x
+      genInt ($(TH.conP nameV [TH.newName "x" >>= TH.varP])) = toInt x
       logTable x = genLogTable $ genInt x
       powTable x = genPowTable $ genInt x
    |]
