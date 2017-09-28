@@ -72,6 +72,7 @@ instance (GenPoly256 a) => Num (GF256 a) where
 
 instance (GenPoly256 a) => Fractional (GF256 a) where
   fromRational r = fromInteger (numerator r) / fromInteger (denominator r)
+  recip 0 = error "divide by zero"
   recip x = pow2 $ 255 - log2 x
 
 {-
