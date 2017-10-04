@@ -75,6 +75,13 @@ instance (GenPoly256 a) => Fractional (GF256 a) where
   recip 0 = error "divide by zero"
   recip x = pow2 $ 255 - log2 x
 
+instance (GenPoly256 a) => Ord (GF256 a) where
+  compare x y = compare (toInt x) (toInt y)
+
+instance (GenPoly256 a) => Bounded (GF256 a) where
+  minBound = 0
+  maxBound = 255
+
 {-
 instance (GenPoly256 a) => FiniteField (GF256 a) where
   order _ = 256
