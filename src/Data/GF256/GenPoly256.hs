@@ -1,8 +1,20 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wall #-}
+-----------------------------------------------------------------------------
+-- |
+-- module      :  Data.GF256.GenPoly256
+-- Copyright   :  (c) 2017 Naoyuki MORITA
+-- License     :  MIT
+--
+-- Maintainer  :  naoyuki.morita@gmail.com
+-- Stability   :  experimental
+-- Portability :  non-portable (TemplateHaskell)
+--
+-----------------------------------------------------------------------------
 
 module Data.GF256.GenPoly256
   (GenPoly256 (..)
+  -- * Template haskell utilities
   ,declInstGP256
   ) where
 
@@ -11,6 +23,12 @@ import TypeLevel.Number.Nat
 import Data.Bits
 import Data.List (sort)
 import qualified Data.Array.Unboxed as UA
+
+class GenPoly256 k where
+  genVal :: k
+  genInt :: k -> Int
+  logTable :: k -> UA.UArray Int Int
+  powTable :: k -> UA.UArray Int Int
 
 genPowList :: Int -> [Int]
 genPowList x = take 255 $ iterate f 1
@@ -22,12 +40,6 @@ genPowTable x = UA.array (0,254) $ zip [0..254] $ genPowList x
 
 genLogTable :: Int -> UA.UArray Int Int
 genLogTable x = UA.array (1,255) $ sort $ zip (genPowList x) [0..254]
-
-class GenPoly256 k where
-  genVal :: k
-  genInt :: k -> Int
-  logTable :: k -> UA.UArray Int Int
-  powTable :: k -> UA.UArray Int Int
 
 patUnbox :: TH.Name -> String -> TH.PatQ
 patUnbox cname vname = TH.conP cname [TH.varP =<< TH.newName vname]

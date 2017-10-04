@@ -35,21 +35,11 @@ newtype GF256 a = GF256 Int deriving (Eq, Typeable)
 toInteger :: GF256 a -> Integer
 toInteger (GF256 x) = fromIntegral x
 
-genPrimList :: (GenPoly256 a) => a -> [Int]
-genPrimList x = 1 : (takeWhile (/= 1) $ iterate nextElem 2)
-  where gp = genInt x
-        nextElem :: Int -> Int
-        nextElem y = let z = y * 2 in
-                       if (z .&. 256) /= 0
-                       then z `xor` gp
-                       else z
-
 instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
   generator _ = genInt (genVal :: a)
   fromInt x = ret
     where ret = GF256 $ x `F2.mod` generator ret
   toInt (GF256 x) = x
-  primitives _ = genPrimList (genVal :: a)
   log2 x = tbl UA.! (toInt x)
     where tbl = logTable (genVal :: a)
   pow2 x = fromInt $ tbl UA.! (x `mod` 255)

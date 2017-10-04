@@ -39,6 +39,7 @@ import Prelude hiding (mod, divMod)
 import Data.Bits
 import Data.Word
 
+-- | Type class for representing polynomials over GF(2)
 class GF2Polynomial k where
   -- |Returns the leftmost position of the bit '1'
   highestBit :: k -> Int
