@@ -21,7 +21,7 @@ module Data.GF256
 import Prelude hiding (toInteger)
 import qualified Data.GF2Polynomial as F2
 -- import Data.FiniteField.Base
-import Data.ExtensionF2
+import Data.GF2Extension
 import qualified Data.Array.Unboxed as UA
 import Data.Ratio
 import Data.Bits
@@ -35,7 +35,7 @@ newtype GF256 a = GF256 Int deriving (Eq, Typeable)
 toInteger :: GF256 a -> Integer
 toInteger (GF256 x) = fromIntegral x
 
-instance (GenPoly256 a) => ExtensionF2 (GF256 a) where
+instance (GenPoly256 a) => GF2Extension (GF256 a) where
   generator _ = genInt (genVal :: a)
   fromInt x = ret
     where ret = GF256 $ x `F2.mod` generator ret

@@ -24,7 +24,7 @@ library
   hs-source-dirs: src
   exposed-modules:
      Data.GF256
-     Data.ExtensionF2
+     Data.GF2Extension
      Data.GF2Polynomial
      Data.GF256.GenPoly256
      Data.GF256.GP256Insts

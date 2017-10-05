@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
--- module      :  Data.ExtensionF2
+-- module      :  Data.GF2Extension
 -- Copyright   :  (c) 2017 Naoyuki MORITA
 -- License     :  MIT
 --
@@ -11,12 +11,12 @@
 --
 -----------------------------------------------------------------------------
 
-module Data.ExtensionF2
-  ( ExtensionF2 (..)
+module Data.GF2Extension
+  ( GF2Extension (..)
   ) where
 
 -- | Type class for extension field of GF(2)
-class ExtensionF2 k where
+class GF2Extension k where
   -- | Returns the generator polynomial as Int value.
   generator :: k -> Int
   -- | Generate an element of the field from an Int value.
