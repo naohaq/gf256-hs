@@ -24,6 +24,7 @@ import Data.Bits
 import Data.List (sort)
 import qualified Data.Array.Unboxed as UA
 
+-- | Type class for generator polynomial of \(\mathrm{GF}(2^8)\)
 class GenPoly256 k where
   genVal :: k
   genInt :: k -> Int
@@ -64,6 +65,8 @@ declNT tcon vcon n = TH.newtypeD cxt tcon [] Nothing (body vcon) drv
         body nm = TH.normalC nm [tp]
         drv = sequence []
 
+-- | Template function that generates top-level declaration of
+--  primitive polynomial.
 declInstGP256 :: Integer -> TH.DecsQ
 declInstGP256 n = do
   tcon <- TH.newName $ "PP" ++ show n

@@ -1,4 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables, DeriveDataTypeable, TemplateHaskell #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
@@ -20,7 +21,9 @@ module Data.GF256
 
 import Prelude hiding (toInteger)
 import qualified Data.GF2Polynomial as F2
--- import Data.FiniteField.Base
+#if defined(InstanceOfFiniteField)
+import Data.FiniteField (FiniteField(..))
+#endif
 import Data.GF2Extension
 import qualified Data.Array.Unboxed as UA
 import Data.Ratio
@@ -42,8 +45,9 @@ instance (GenPoly256 a) => GF2Extension (GF256 a) where
   toInt (GF256 x) = x
   log2 x = tbl UA.! (toInt x)
     where tbl = logTable (genVal :: a)
-  pow2 x = fromInt $ tbl UA.! (x `mod` 255)
+  pow2 x = ret
     where tbl = powTable (genVal :: a)
+          ret = GF256 $ tbl UA.! (x `mod` 255)
   degree _ = 8
 
 instance Show (GF256 a) where
@@ -72,12 +76,18 @@ instance (GenPoly256 a) => Bounded (GF256 a) where
   minBound = 0
   maxBound = 255
 
-{-
+#if defined(InstanceOfFiniteField)
+sqrt' :: (GenPoly256 a) => GF256 a -> GF256 a
+sqrt' 0 = 0
+sqrt' x = pow2 k
+  where n = log2 x
+        k = (128 * n) `mod` 255
+
 instance (GenPoly256 a) => FiniteField (GF256 a) where
   order _ = 256
   char  _ = 2
-  pthRoot x = x * x
+  pthRoot x = sqrt' x
   allValues = 0 : map pow2 [0..254]
--}
+#endif
 
 -- EOF
