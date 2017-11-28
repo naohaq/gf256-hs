@@ -25,36 +25,43 @@ import qualified Data.GF2Polynomial as F2
 import Data.FiniteField (FiniteField(..))
 #endif
 import Data.GF2Extension
-import qualified Data.Array.Unboxed as UA
+import Data.Array.Unboxed ((!))
 import Data.Ratio
+import qualified Data.Word as W
 import Data.Bits
 import Data.Typeable
 
 import Data.GF256.GenPoly256
 import Data.GF256.GP256Insts
 
-newtype GF256 a = GF256 Int deriving (Eq, Typeable)
+newtype GF256 a = GF256 W.Word8 deriving (Eq, Typeable)
 
 toInteger :: GF256 a -> Integer
 toInteger (GF256 x) = fromIntegral x
 
+fromWord8 :: W.Word8 -> GF256 a
+fromWord8 x = GF256 x
+
+toWord8 :: GF256 a -> W.Word8
+toWord8 (GF256 x) = x
+
 instance (GenPoly256 a) => GF2Extension (GF256 a) where
   generator _ = genInt (genVal :: a)
   fromInt x = ret
-    where ret = GF256 $ x `F2.mod` generator ret
-  toInt (GF256 x) = x
-  log2 x = tbl UA.! (toInt x)
+    where ret = GF256 $ fromIntegral $ x `F2.mod` generator ret
+  toInt (GF256 x) = fromIntegral x
+  log2 (GF256 x) = tbl ! x
     where tbl = logTable (genVal :: a)
   pow2 x = ret
     where tbl = powTable (genVal :: a)
-          ret = GF256 $ tbl UA.! (x `mod` 255)
+          ret = GF256 $ tbl ! (x `mod` 255)
   degree _ = 8
 
 instance Show (GF256 a) where
   showsPrec n (GF256 x) = showsPrec n x
 
 instance (GenPoly256 a) => Num (GF256 a) where
-  x + y = fromInt $ toInt x `xor` toInt y
+  (GF256 x) + (GF256 y) = GF256 $ x `xor` y
   0 * _ = 0
   _ * 0 = 0
   x * y = pow2 $ (log2 x + log2 y)
@@ -62,15 +69,15 @@ instance (GenPoly256 a) => Num (GF256 a) where
   negate x = x
   abs x = x
   signum _ = 1
-  fromInteger x = fromInt $ fromIntegral $ x `F2.mod` fromIntegral (genInt (genVal :: a))
+  fromInteger x = fromWord8 $ fromIntegral $ x `F2.mod` fromIntegral (genInt (genVal :: a))
 
 instance (GenPoly256 a) => Fractional (GF256 a) where
   fromRational r = fromInteger (numerator r) / fromInteger (denominator r)
   recip 0 = error "divide by zero"
   recip x = pow2 $ 255 - log2 x
 
-instance (GenPoly256 a) => Ord (GF256 a) where
-  compare x y = compare (toInt x) (toInt y)
+instance Ord (GF256 a) where
+  compare x y = compare (toWord8 x) (toWord8 y)
 
 instance (GenPoly256 a) => Bounded (GF256 a) where
   minBound = 0
