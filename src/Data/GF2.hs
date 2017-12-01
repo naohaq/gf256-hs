@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,6 +20,9 @@ module Data.GF2
 
 import Data.Ratio
 import Data.Bits ( xor, (.&.) )
+#if defined(InstanceOfFiniteField)
+import Data.FiniteField (FiniteField(..))
+#endif
 import Data.Typeable
 
 newtype GF2 = GF2 Bool deriving (Eq, Typeable)
@@ -47,6 +51,10 @@ instance Fractional GF2 where
   recip 0 = error "divide by zero"
   recip x = x
 
+instance Enum GF2 where
+  toEnum x = GF2 $ toEnum x
+  fromEnum (GF2 x) = fromEnum x
+
 instance Ord GF2 where
   compare (GF2 x) (GF2 y) = compare x y
 
@@ -54,5 +62,12 @@ instance Bounded GF2 where
   minBound = 0
   maxBound = 1
 
+#if defined(InstanceOfFiniteField)
+instance FiniteField GF2 where
+  order _ = 2
+  char  _ = 2
+  pthRoot x = x
+  allValues = [0,1]
+#endif
 
 -- EOF
