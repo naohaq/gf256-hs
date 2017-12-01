@@ -34,8 +34,12 @@ import Data.Typeable
 import Data.GF256.GenPoly256
 import Data.GF256.GP256Insts
 
+-- | \(\mathrm{GF}(2^8)\): an extension field of \(\mathrm{GF}(2)\) whose extension degree is 8.
+--
+-- The generator polynomial must be given as a type parameter.
 newtype GF256 a = GF256 W.Word8 deriving (Eq, Typeable)
 
+-- | Conversion to 'Integer'
 toInteger :: GF256 a -> Integer
 toInteger (GF256 x) = fromIntegral x
 
@@ -82,6 +86,23 @@ instance Ord (GF256 a) where
 instance (GenPoly256 a) => Bounded (GF256 a) where
   minBound = 0
   maxBound = 255
+
+instance (GenPoly256 a) => Bits (GF256 a) where
+  (GF256 x) .&. (GF256 y) = fromWord8 $ x .&. y
+  (GF256 x) .|. (GF256 y) = fromWord8 $ x .|. y
+  xor (GF256 x) (GF256 y) = fromWord8 $ xor x y
+  complement (GF256 x)    = fromWord8 $ complement x
+  shift  (GF256 x) k      = fromWord8 $ shift x k
+  rotate (GF256 x) k      = fromWord8 $ rotate x k
+  bitSize (GF256 x)       = finiteBitSize x
+  bitSizeMaybe (GF256 x)  = bitSizeMaybe x
+  isSigned _              = False
+  testBit (GF256 x) k     = testBit x k
+  bit k                   = fromWord8 $ bit k
+  popCount (GF256 x)      = popCount x
+
+instance (GenPoly256 a) => FiniteBits (GF256 a) where
+  finiteBitSize (GF256 x) = finiteBitSize x
 
 #if defined(InstanceOfFiniteField)
 sqrt' :: (GenPoly256 a) => GF256 a -> GF256 a
