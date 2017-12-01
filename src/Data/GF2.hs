@@ -25,12 +25,22 @@ import Data.FiniteField (FiniteField(..))
 #endif
 import Data.Typeable
 
+-- | Finite field of order 2.
+--
+-- Its elements are \(\{0, 1\}\).
+--
+-- Arithmetic rules are shown in the following equations:
+--
+-- \(0 + 0 = 0\), \(0 + 1 = 1\), \(1 + 0 = 1\), \(1 + 1 = 0\)
+--
+-- \(0 * 0 = 0\), \(0 * 1 = 0\), \(1 * 0 = 0\), \(1 * 1 = 1\)
 newtype GF2 = GF2 Bool deriving (Eq, Typeable)
 
 boolToInteger :: Bool -> Integer
 boolToInteger False = 0
 boolToInteger True  = 1
 
+-- | Conversion to other `Num` class type.
 fromGF2 :: (Num a) => GF2 -> a
 fromGF2 (GF2 x) = fromInteger $ boolToInteger x
 
