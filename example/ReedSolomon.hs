@@ -1,18 +1,20 @@
 
 module Main where
 
-import Data.ExtensionF2
+import Data.GF2Extension
 import Data.GF256
 import Data.Bits
 import qualified Data.Word as W
 import qualified Polynomial as P
 
-gen_ecc200 :: Int -> [GF256 PP301]
+type F256 = GF256 PP301
+
+gen_ecc200 :: Int -> [F256]
 gen_ecc200 x = foldr P.mul [1] $ map e [1..x]
-  where e :: Int -> [GF256 PP301]
+  where e :: Int -> [F256]
         e k = [1, pow2 k]
 
-gp_pp301_18 :: [GF256 PP301]
+gp_pp301_18 :: [F256]
 gp_pp301_18 = gen_ecc200 18
 
 cws :: [W.Word8]
@@ -29,7 +31,7 @@ ews = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
-check_ecc200 :: (Integral a) => [a] -> [GF256 PP301]
+check_ecc200 :: (Integral a) => [a] -> [F256]
 check_ecc200 ds = dp `P.mod` gp_pp301_18
   where dp = map (fromInt.fromIntegral) ds
 
