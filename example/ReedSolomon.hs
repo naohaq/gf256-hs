@@ -7,6 +7,8 @@ import Data.Bits
 import qualified Data.Word as W
 import qualified Polynomial as P
 
+import MyUtil
+
 type F256 = GF256 PP301
 
 code_N :: Int
