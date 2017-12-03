@@ -112,21 +112,40 @@ correctErrors ers xs = iter 0 ers xs
         iter j ((k,e):es) (y:ys) | j == k    = (y `xor` e) : iter (j+1) es ys
                                  | otherwise = y : iter (j+1) ((k,e):es) ys
 
+toWord8 :: F256 -> W.Word8
+toWord8 x = (fromIntegral . toInt) x
+
+showHex :: [F256] -> String
+showHex = joinStr " " . map (fromW8toHex . toWord8)
+
+dumpMsg :: [W.Word8] -> [String]
+dumpMsg [] = []
+dumpMsg xs = (joinStr " " . map fromW8toHex) hs : dumpMsg ts
+  where hs = take 8 xs
+        ts = drop 8 xs
+
 main :: IO ()
 main = do
+  let rws = zipWith xor cws ews
   putStrLn $ "RS Code: (" ++ show code_N ++ "," ++ show (code_N - code_2t) ++ ")"
-  let csum = check_ecc200 (zipWith xor cws ews)
+  putStrLn $ "Received message: "
+  mapM_ (putStrLn . ("   " ++)) (dumpMsg rws)
+  let csum = check_ecc200 rws
   let synd = calcSyndrome csum
-  putStrLn $ "Syndromes: " ++ show synd
+  putStrLn $ "Syndromes: " ++ showHex synd
   let sigma_r = errLocator synd
-  putStrLn $ "Error locator: " ++ show sigma_r
+  putStrLn $ "Error locator: " ++ showHex sigma_r
   let locs = solveErrLocations sigma_r
   let locs_r = [code_N-1-k | k <- reverse locs]
   putStrLn $ "Error locations: " ++ show locs_r
   let mtx = errMatrix locs synd
   putStrLn "Error matrix:"
-  mapM_ (putStrLn . ("  "++) . show) mtx
+  mapM_ (putStrLn . ("   [ " ++) . (++ " ]") . showHex) mtx
   let evs = solveErrMatrix (length locs) mtx
-  putStrLn $ "Error values: " ++ show (reverse evs)
+  let evs_r = reverse evs
+  putStrLn $ "Error values: " ++ showHex evs_r
+  let rws_corr = correctErrors (zip locs_r (map toWord8 evs_r)) rws
+  putStrLn $ "Corrected message: "
+  mapM_ (putStrLn . ("   " ++)) (dumpMsg rws_corr)
 
 -- EOF
