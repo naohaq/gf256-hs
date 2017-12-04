@@ -23,25 +23,25 @@ import TypeLevel.Number.Nat
 import Data.Bits
 import qualified Data.Word as W
 import Data.List (sort)
-import qualified Data.Array.Unboxed as UA
+import qualified Data.Vector.Unboxed as V
 
 -- | Type class for generator polynomial of \(\mathrm{GF}(2^8)\)
 class GenPoly256 k where
   genVal :: k
   genInt :: k -> Int
-  logTable :: k -> UA.UArray W.Word8 Int
-  powTable :: k -> UA.UArray Int W.Word8
+  logTable :: k -> V.Vector Int
+  powTable :: k -> V.Vector W.Word8
 
 genPowList :: Int -> [W.Word8]
 genPowList x = map fromIntegral $ take 255 $ iterate f 1
   where f z | (z .&. 128) /= 0  = (z `shiftL` 1) `xor` x
             | otherwise         = (z `shiftL` 1)
 
-genPowTable :: Int -> UA.UArray Int W.Word8
-genPowTable x = UA.array (0,254) $ zip [0..254] $ genPowList x
+genPowTable :: Int -> V.Vector W.Word8
+genPowTable x = V.fromList $ genPowList x
 
-genLogTable :: Int -> UA.UArray W.Word8 Int
-genLogTable x = UA.array (1,255) $ sort $ zip (genPowList x) [0..254]
+genLogTable :: Int -> V.Vector Int
+genLogTable x = V.fromList $ map snd $ sort $ zip (genPowList x) [0..254]
 
 patUnbox :: TH.Name -> String -> TH.PatQ
 patUnbox cname vname = TH.conP cname [TH.varP =<< TH.newName vname]
