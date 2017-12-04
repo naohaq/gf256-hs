@@ -17,11 +17,9 @@ gen_ecc200 x = gen_poly pow2 x
 gp_pp301 :: [F256]
 gp_pp301 = gen_ecc200 code_2t
 
-check_ecc200 :: (Integral a) => [a] -> [F256]
-check_ecc200 ds = calcChecksum gp_pp301 ds
-
-toWord8 :: F256 -> W.Word8
-toWord8 x = (fromIntegral . toInt) x
+check_ecc200 :: [W.Word8] -> [F256]
+check_ecc200 ds = calcChecksum gp_pp301 dp
+  where dp = map fromWord8 ds
 
 showHex :: [F256] -> String
 showHex = joinStr " " . map (fromW8toHex . toWord8)
@@ -60,7 +58,7 @@ main = do
   let evs = solveErrMatrix mtx
   let evs_r = reverse evs
   putStrLn $ "Error values: " ++ showHex evs_r
-  let rws_corr = map toWord8 $ correctErrors (zip locs_r evs_r) $ map (fromInteger . fromIntegral) rws
+  let rws_corr = map toWord8 $ correctErrors (zip locs_r evs_r) $ map fromWord8 rws
   putStrLn $ "Corrected message: "
   mapM_ (putStrLn . ("   " ++)) (dumpMsg rws_corr)
   putStrLn $ "Checksum : " ++ showHex (check_ecc200 rws_corr)

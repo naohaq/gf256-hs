@@ -25,9 +25,8 @@ gen_poly :: (Num k) => (Int -> k) -> Int -> [k]
 gen_poly fp x = foldr P.mul [1] $ map e [1..x]
   where e j = [1, negate (fp j)]
 
-calcChecksum :: (Integral a, Num k, Fractional k) => [k] -> [a] -> [k]
-calcChecksum gp ms = mp `P.mod` gp
-  where mp = map (fromInteger . fromIntegral) ms
+calcChecksum :: (Num k, Fractional k) => [k] -> [k] -> [k]
+calcChecksum gp mp = mp `P.mod` gp
 
 calcSyndrome :: (Num k) => (Int -> k) -> [k] -> [k]
 calcSyndrome fp xs = [P.apply xs (fp j) | j <- [1..code_2t]]
